@@ -1,0 +1,21 @@
+{
+  "type": "module",
+  "name": "cyanicjs",
+  "version": "0.0.2",
+  "repository": "https://github.com/pixldemon/cyanic",
+  "description": "Zero-dependency reactive view library",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "dependencies": {
+    "@types/node": "^13.13.5",
+    "typescript": "^3.8.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "tsc --skipLibCheck",
+    "watch": "tsc -w --skipLibCheck",
+    "test": "echo 'No tests specified'"
+  },
+  "author": "pixldemon",
+  "license": "ISC"
+}
