@@ -32,6 +32,11 @@ const directives: Dict<(vn: VNode, dv: string) => string> = {
 		const result = `${arrName}.map((${varName}, ${indexName === '' ? 'index' : indexName}) => ${compileVNode(node)})`
 
 		return result
+	},
+	vModel(node, field) {
+		node.props.set(':js:value', field)
+		node.props.set('@input', `${field}=$evt.target.value`)
+		return compileVNode(node)
 	}
 }
 
@@ -42,7 +47,7 @@ function compilePropDict(dict: Dict) {
 		else if (key.startsWith(':'))
 			acc += parseDataBinding(key, dict[key])
 		else
-			acc += `'${key}':${parseMustacheBindings(dict[key].replace(/(?<!\\)"/g, '\\"'))}, `
+			acc += `'${key}':${typeof dict[key] === 'string' ? parseMustacheBindings(dict[key].replace(/(?<!\\)"/g, '\\"')) : dict[key]}, `
 		return acc
 	}, '')}}`
 }

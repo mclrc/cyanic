@@ -1,14 +1,15 @@
 import Observable from './observable'
 import makeReactive from './makeReactive'
 
-export default <T = any>(initial: T) => new ReactiveRef<T>(initial)
+export default <T = any>(initial?: T) => new ReactiveRef<T>(initial)
 
 export class ReactiveRef<T = any> {
 	private _value: T = null
 	observable = new Observable()
 
-	constructor(initial: T) {
-		this._value = makeReactive(initial)
+	constructor(initial?: T) {
+		if (initial)
+			this._value = makeReactive(initial)
 	}
 
 	get value() {
