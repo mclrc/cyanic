@@ -1,6 +1,6 @@
+import Cyanic from '../instance'
 import { Stack } from '../utils'
 import Observable from './observable'
-import Cyanic from '../instance'
 import queueJob from './scheduler'
 
 
@@ -39,6 +39,7 @@ export default class Job {
 
 	queue() {
 		queueJob(this)
+		return this
 	}
 
 	run() {

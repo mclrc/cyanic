@@ -6,11 +6,11 @@
   "description": "Zero-dependency reactive view library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "dependencies": {
-    "@types/node": "^13.13.5",
-    "typescript": "^3.8.3"
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^13.13.15",
+    "typescript": "^3.9.7"
   },
-  "devDependencies": {},
   "scripts": {
     "build": "tsc --skipLibCheck",
     "watch": "tsc -w --skipLibCheck",

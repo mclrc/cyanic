@@ -18,7 +18,7 @@ function makeArrayReactive(arr: any[]) {
 }
 
 
-function createObjectAccessorTraps() {
+function createObjectAccessorTraps(): ProxyHandler<any> {
 	const observables = new Map<string, Observable>()
 	return {
 		get: createObjectPropertyGetter(observables),
@@ -27,7 +27,7 @@ function createObjectAccessorTraps() {
 	}
 }
 
-function createArrayAccessorTraps() {
+function createArrayAccessorTraps(): ProxyHandler<Array<any>> {
 	const observable = new Observable()
 	return {
 		get: createArrayPropertyGetter(observable),
@@ -38,14 +38,14 @@ function createArrayAccessorTraps() {
 
 
 function createObjectPropertyGetter(observables: Map<string, Observable>) {
-	return function (target: Object, key: string): any {
+	return function (target: Object, key: string, receiver: typeof Proxy): any {
 		if (key === '__isProxy') return true
 		if (observables.has(key))
 			observables.get(key).depend()
 		else
 			observables.set(key, new Observable().depend())
 
-		return target[key] instanceof Function ? target[key].bind(target) : target[key];
+		return target[key] instanceof Function ? target[key].bind(receiver) : target[key];
 	}
 }
 
@@ -75,7 +75,7 @@ const arrayMutators = [
 ]
 
 function createArrayPropertyGetter(observable: Observable) {
-	return function (target: Object, key: string) {
+	return function (target: Object, key: string, receiver: typeof Proxy) {
 		if (key === '__isProxy') return true
 		observable.depend()
 
@@ -90,15 +90,7 @@ function createArrayPropertyGetter(observable: Observable) {
 					return i
 				}
 			}
-			if (arrayMutators.includes(key as string)) {
-				return function (...args) {
-					const arr = Array.prototype[key].apply(target, args)
-					observable.notify()
-					return arr
-				}
-			} else {
-				return val.bind(target)
-			}
+			return val.bind(receiver)
 		}
 
 		return target[key]
