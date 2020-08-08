@@ -6,8 +6,6 @@ import queueJob from './scheduler'
 
 let id = 0
 
-export const watch = (fun: Function) => new Job(fun).run()
-
 export default class Job {
 	
 	static targetStack: Stack<Job> = new Stack()

@@ -1,9 +1,8 @@
 import Observable from './observable'
 import makeReactive from './makeReactive'
 
-export default <T = any>(initial?: T) => new ReactiveRef<T>(initial)
 
-export class ReactiveRef<T = any> {
+export default class ReactiveRef<T = any> {
 	private _value: T = null
 	observable = new Observable()
 
