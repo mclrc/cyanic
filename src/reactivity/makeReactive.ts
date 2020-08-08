@@ -8,116 +8,64 @@ export default function makeReactive(state: any) {
 }
 
 function makeObjectReactive(obj: any) {
-	obj = mapObject(obj, v => makeReactive(v))
-	return new Proxy(obj, createObjectAccessorTraps())
+	const observables = new Map<string | number | symbol, Observable>()
+
+	return new Proxy(mapObject(obj, p => makeReactive(p)), {
+		get(target, key, receiver) {
+			if (key === '__isProxy') return true
+
+			if (observables.has(key))
+				observables.get(key).depend()
+			else
+				observables.set(key, new Observable().depend())
+
+			return typeof target[key] === 'function' ? target[key].bind(receiver) : target[key]
+		},
+		set(target, key, value) {
+			if (target[key] === value) return true
+
+			target[key] = makeReactive(value)
+			observables.get(key)?.notify()
+
+			return true
+		},
+		deleteProperty(target, key) {
+			if (!(key in target)) return false
+
+			delete target[key]
+			observables.get(key)?.notify()
+
+			return true
+		}
+	})
 }
 
-function makeArrayReactive(arr: any[]) {
-	arr = arr.map(i => makeReactive(i))
-	return new Proxy(arr, createArrayAccessorTraps())
-}
-
-
-function createObjectAccessorTraps(): ProxyHandler<any> {
-	const observables = new Map<string, Observable>()
-	return {
-		get: createObjectPropertyGetter(observables),
-		set: createObjectPropertySetter(observables),
-		deleteProperty: createPropertyDestructor(observables)
-	}
-}
-
-function createArrayAccessorTraps(): ProxyHandler<Array<any>> {
+function makeArrayReactive(arr: Array<any>) {
 	const observable = new Observable()
-	return {
-		get: createArrayPropertyGetter(observable),
-		set: createArrayPropertySetter(observable),
-		deleteProperty: createPropertyDestructor(observable)
-	}
-}
 
+	return new Proxy(arr.map(i => makeReactive(i)), {
+		get(target, key, receiver) {
+			if (key === '__isProxy') return true
 
-function createObjectPropertyGetter(observables: Map<string, Observable>) {
-	return function (target: Object, key: string, receiver: typeof Proxy): any {
-		if (key === '__isProxy') return true
-		if (observables.has(key))
-			observables.get(key).depend()
-		else
-			observables.set(key, new Observable().depend())
+			observable.depend()
 
-		return target[key] instanceof Function ? target[key].bind(receiver) : target[key];
-	}
-}
+			return typeof target[key] === 'function' ? target[key].bind(receiver) : target[key]
+		},
+		set(target, key, value) {
+			if (target[key] === value) return true
 
-function createObjectPropertySetter(observables: Map<string, Observable>) {
-	return function (target: Object, key: string, value: any): boolean {
-		if (target[key] === value)
+			target[key] = makeReactive(value)
+			observable.notify()
+
 			return true
+		},
+		deleteProperty(target, key) {
+			if (!(key in target)) return false
 
-		target[key] = makeReactive(value);
-		if (observables.has(key))
-			observables.get(key).notify()
-
-		return true
-	}
-}
-
-const arrayMutators = [
-	"copyWithin",
-	"fill",
-	"pop",
-	"push",
-	"reverse",
-	"shift",
-	"sort",
-	"splice",
-	"unshift"
-]
-
-function createArrayPropertyGetter(observable: Observable) {
-	return function (target: Object, key: string, receiver: typeof Proxy) {
-		if (key === '__isProxy') return true
-		observable.depend()
-
-		const val = target[key]
-
-		if (val instanceof Function) {
-			if (key === "push" || key === "unshift") {
-				return function (item: any) {
-					const i = makeReactive(item)
-					Array.prototype[key].apply(target, [i])
-					observable.notify()
-					return i
-				}
-			}
-			return val.bind(receiver)
-		}
-
-		return target[key]
-	}
-}
-
-function createArrayPropertySetter(observable: Observable) {
-	return function (target: Object, key: string, value: any) {
-		if (target[key] === value)
-			return true
-
-		target[key] = makeReactive(value)
-		observable.notify()
-
-		return true
-	}
-}
-
-function createPropertyDestructor(observableMapOrInstance: Map<string, Observable> | Observable) {
-	return function (target: Object, key: string): boolean {
-		if (key in target) {
-			delete target[key];
-
-			(observableMapOrInstance instanceof Observable ? observableMapOrInstance : observableMapOrInstance.get(key)).notify()
+			delete target[key]
+			observable.notify()
 
 			return true
 		}
-		return false
-	}
+	})
 }
