@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "cyanicjs",
+  "name": "cyanic",
   "version": "0.0.2",
   "repository": "https://github.com/pixldemon/cyanic",
   "description": "Zero-dependency reactive view library",
@@ -17,5 +17,5 @@
     "test": "echo 'No tests specified'"
   },
   "author": "pixldemon",
-  "license": "ISC"
+  "license": "MIT"
 }

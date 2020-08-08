@@ -19,34 +19,7 @@ Tiny, zero-dependency reactive view library inspired by Vue
 
 This library is a work in progress with a lot of inefficiencies and bugs to iron out. It was created for the purpose of gaining a better understanding about the inner workings of other frontend frameworks. __Do not use this for serious projects.__
 
-##### Example
-```ts
-import Cyanic, { ref, useProps, useHook, computed, useTemplate, useComponents } from 'visiejs'
-
-const counter = () => {
-	useTemplate(`<p>
-									{{displayString}}
-									<button @click="isRunning.value ? stop() : start()">
-										{{isRunning.value ? 'Stop' : 'Start'}}
-									</button>
-								</p>`)
-
-	const count = ref(0)
-	const displayString = computed<string>(() => `${Math.floor(count.value / 60)}m ${count.value % 60}s`)
-	
-	const intervalId = ref(null)
-	const isRunning = computed<boolean>(() => intervalId.value != null)
-
-	const start = () => intervalId.value = setInterval(() => count.value++, 1000)
-	const stop = () => { clearInterval(intervalId.value); intervalId.value = null }
-
-	useHook('mounted', start)
-
-	return { count, displayString, start, stop, isRunning }
-}
-
-new Cyanic(counter).$mount('#app')
-```
+__Example code & basic documentation coming soon__
 
 ##### Installation
 
