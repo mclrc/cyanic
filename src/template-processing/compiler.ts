@@ -1,4 +1,4 @@
-import { Dict, secureEval, makeDict } from '../utils'
+import { Dict, saferEval, makeDict } from '../utils'
 import parseHTML from './parser'
 import { VNode, h } from '../vdom'
 
@@ -73,5 +73,5 @@ export default function compile(template: string) {
 	const vnode = parseHTML(template)[0]
 	const code = 'return ' + compileVNode(vnode)
 
-	return secureEval(code, { h })
+	return saferEval(code, { h })
 }

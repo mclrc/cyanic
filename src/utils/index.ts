@@ -65,7 +65,19 @@ export function mapObject<T = any>(obj: any, op: Function): T {
 
 const sandboxProxies = new WeakMap()
 
-export function secureEval(code: string, additionalContext: any = {}) {
+function detectIllegalParentBlockTermination(code: string) {
+	let block = 0
+	for (const c of code) {
+		if (c === '{') block++
+		else if (c === '}') {
+			if (block === 0) throw new Error('Illegal closing curly brace in saferEval: No open blocks left to close')
+			block--
+		}
+	}
+}
+
+export function saferEval(code: string, additionalContext: any = {}) {
+	detectIllegalParentBlockTermination(code)
 	code = `with(sandbox) {${code}}`
 	const func = new Function("sandbox", code)
 

@@ -42,8 +42,7 @@ export default function parse(html: string): VNode[] {
 	while (html !== '') {
 		const nextTag = regex.anyTag.exec(html)
 		if (!nextTag || nextTag.index) {
-			const textContent = html.substr(0, nextTag ? nextTag.index : html.length)
-				.trimStart()
+			const textContent = html.substr(0, nextTag ? nextTag.index : html.length).trim()
 			if (textContent !== '')
 				stack.push(h(textContent))
 		}
@@ -77,54 +76,3 @@ export default function parse(html: string): VNode[] {
 	}
 	return stack.toArray()
 }
-
-// export default function parse(html: string): VNode[] {
-// 	const stack = new Stack<VNode>()
-// 	const closedSet = new Set<VNode>()
-
-// 	while (html !== '') {
-// 		const nextTag = regex.anyTag.exec(html) as RegExpExecArray
-
-// 		if (regex.startsWithTextContent.test(html))
-// 			stack.push(h(html.substr(0, nextTag ? nextTag.index : html.length).trim()) as VNode)
-
-// 		if (!nextTag) {
-// 			break
-// 		} else if (isComment(nextTag[0])) {
-// 			html = html.slice(nextTag.index + nextTag[0].length)
-// 			continue
-// 		}
-
-// 		const openingTag = regex.openingTag.exec(nextTag[0])
-
-// 		if (openingTag) {
-
-// 			const nodeToAdd = h(
-// 				nextTag[1],
-// 				openingTag && openingTag[2] ? parseProps(openingTag[2]) : {}
-// 			) as VNode
-// 			stack.push(nodeToAdd)
-
-// 			if (openingTag[3])
-// 				closedSet.add(nodeToAdd)
-
-// 		} else {
-
-// 			const content = []
-
-// 			while (stack.peek() && (stack.peek().type !== nextTag[1] || closedSet.has(stack.peek())))
-// 				content.unshift(stack.pop())
-
-// 			const container = stack.peek()
-
-// 			if (!container)
-// 				throw new Error('No corresponding opening tag found for ' + nextTag[0])
-
-// 			content.forEach(container.append.bind(container))
-// 			closedSet.add(container)
-// 		}
-
-// 		html = html.slice(nextTag.index + nextTag[0].length)
-// 	}
-// 	return stack.toArray()
-// }
