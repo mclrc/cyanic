@@ -3,7 +3,7 @@ import { mapObject } from '../utils';
 
 
 export default function makeReactive(state: any) {
-	if (state && state.__isProxy) return state
+	if (state?.__isProxy) return state
 	return Array.isArray(state) ? makeArrayReactive(state) : state instanceof Object ? makeObjectReactive(state) : state
 }
 

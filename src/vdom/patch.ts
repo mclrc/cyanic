@@ -46,7 +46,6 @@ export function $patch(
 
 		if (newVNode.type !== '#text') {
 			$patchProps($el as HTMLElement, oldVNode.props, newVNode.props)
-			// if (!newVNode.isComponentRoot)
 			$patchChildren($el as HTMLElement, oldVNode.children, newVNode.children)
 		}
 	}
@@ -132,7 +131,7 @@ export function $patchProps(
 export function isSameVNode(a: VNode, b: VNode): boolean {
 	return (
 		!(a.type === '#text' && a.nodeValue !== b.nodeValue) &&
-		(a.props && a.props.get('key')) === (b.props && b.props.get('key')) &&
+		(a.props?.get('key')) === (b.props?.get('key')) &&
 		a.type === b.type
 	)
 }
